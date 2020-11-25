@@ -1,5 +1,6 @@
-pot x^4
-var x
+pot r^4
+var r
 E0 1.05
-D 4 20
+D 3 80
 d 0
+s 0

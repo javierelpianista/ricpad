@@ -1,12 +1,20 @@
 #include <ricpad.hpp>
+#include <options.hpp>
 
-int Dmin, Dmax, d, digits;
+namespace mp = boost::multiprecision;
+namespace gi = GiNaC;
+
+using namespace std;
+using boost::multiprecision::mpfr_float;
+
+int Dmin, Dmax, d, digits, s;
 gi::symbol x;
 gi::ex potential;
 map<string, string> options;
 
 int main() {
-    read_input("input");
+    Options opts;
+    read_input("input", opts);
 
     options["problem_type"] = "even";
     options["tolerance"] = "1E-100";
@@ -18,13 +26,13 @@ int main() {
 
     cout << "Potential: " << potential << endl;
     cout << "Variable: " << x << endl;
-    cout << potential.series(x == 0, 10) << endl;
+    cout << "s: " << s << endl;
 
-    vector<mpfr_float> Q = get_coefficients(potential, x, 2*Dmax);
+    vector<mpfr_float> Q = get_coefficients<mpfr_float>(potential, x, 2*Dmax);
     cout.precision(digits);
 
     for ( int i = Dmin; i<= Dmax; i++ ) {
-        E0 = RPM_solve(i, d, Q, 0, E0);
+        E0 = RPM_solve(i, d, Q, s, E0);
         cout << "D = " << i << " E0 = " << E0 << endl;
     }
     
