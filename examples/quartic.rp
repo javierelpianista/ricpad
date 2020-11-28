@@ -1,0 +1,9 @@
+pot x^4
+var x
+problem_type even
+D 2 30
+d 0
+s 0
+E0 1.05
+E0I 0.01
+use_complex 1

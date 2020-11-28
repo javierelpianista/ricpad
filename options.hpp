@@ -19,9 +19,12 @@ class Options {
     // For now we set the defaults on construction
     Options() {
         ints["use_rationals"] = 0;
+        ints["use_complex"] = 1;
+
         ints["target_digits"] = -1;
         ints["Dmin"] = 3;
         ints["Dmax"] = -1;
+        ints["d"] = 0;
         ints["digits"] = -1;
         ints["infinite_digits"] = 0;
 
@@ -31,6 +34,7 @@ class Options {
 
         mpfrs["nr_step_size"] = mpfr_float("-1");
         mpfrs["nr_tolerance"] = mpfr_float("-1");
+        mpfrs["E0I"] = mpfr_float(0);
     }
 
     ~Options() = default;

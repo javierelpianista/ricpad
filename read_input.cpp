@@ -31,11 +31,13 @@ void read_input(const string filename, Options &opts, Problem &problem) {
             //TODO program the option to not have Dmax
             opts.ints["Dmax"] = stoi(*p);
         } else if ( what == "d" ) {
-            opts.ints["d"], stoi(*p);
+            opts.ints["d"] = stoi(*p);
         } else if ( what == "s" || what == "l" ) {
             opts.ints["s"] = stoi(*p);
         } else if ( what == "digits" ) {
             opts.ints["digits"] = stoi(*p);
+        } else if ( what == "use_complex" ) {
+            opts.ints["use_complex"] = stoi(*p);
         } else if ( what == "target_digits" ) {
             if ( *p == "max" ) {
                 opts.ints["infinite_digits"] = 1;
@@ -48,6 +50,8 @@ void read_input(const string filename, Options &opts, Problem &problem) {
             opts.mpfrs["nr_tolerance"] = mpfr_float(*p);
         } else if ( what == "nr_diff_epsilon" ) {
             opts.mpfrs["nr_step_size"] = mpfr_float(*p);
+        } else if ( what == "problem_type" ) {
+            opts.strings["problem_type"] = *p;
         } else {
             while ( p != tokens.end() ) {
                 value += *p++;
@@ -149,5 +153,8 @@ void read_input(const string filename, Options &opts, Problem &problem) {
         cout.precision(static_cast<int>(ndigits));
     }
     opts.mpfrs["E0"] = mpfr_float(parsed_options["E0"]);
+    if ( opts.ints["use_complex"] ) 
+        opts.mpfrs["E0I"] = mpfr_float(parsed_options["E0I"]);
+
     problem.set_potential(parsed_options["pot"], parsed_options["var"]);
 }

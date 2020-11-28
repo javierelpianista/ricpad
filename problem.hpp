@@ -7,6 +7,8 @@
 #include <ginac/ginac.h>
 #include <boost/multiprecision/mpfr.hpp>
 
+#include <options.hpp>
+
 using namespace std;
 namespace gi = GiNaC;
 
@@ -70,6 +72,7 @@ class Problem {
             int mult;
 
             if ( problem_type == "even" ) mult = 2;
+            else if ( problem_type == "radial" ) mult = 1;
 
             for ( int i = 0; i <= N; i++ ) {
                 if ( use_rationals == 1 ) {
@@ -84,5 +87,13 @@ class Problem {
             return data;
         };
 
+        template <class T>
+        T get_neg_coeff(
+                const Options & opts
+                ) const
+        {
+            gi::ex coeff = potential.series(x, 1).coeff(x, -1);
+            return gi_to_mp<T>(gi::ex_to<gi::numeric>(coeff));
+        }
 };
 #endif

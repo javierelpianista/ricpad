@@ -1,0 +1,9 @@
+pot -exp(-2/100*r)/r
+var r
+problem_type radial
+D 2 30
+d 0
+s 0
+E0 -0.4
+E0I 0.00
+use_complex 1
