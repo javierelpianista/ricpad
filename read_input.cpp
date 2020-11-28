@@ -26,6 +26,8 @@ void read_input(const string filename, Options &opts, Problem &problem) {
         string what = *p++;
         string value;
 
+        cout << "what: " << what << " val: " << *p << endl;
+
         if ( what == "D" ) {
             opts.ints["Dmin"] = stoi(*p++);
             //TODO program the option to not have Dmax
@@ -128,19 +130,19 @@ void read_input(const string filename, Options &opts, Problem &problem) {
     it = parsed_options.find("E0");
     if ( it == parsed_options.end() ) {
         cout << "The value E0 should be given" << endl;
-        throw 10;
+        exit(1);
     }
     
     it = parsed_options.find("var");
     if ( it == parsed_options.end() ) {
         cout << "The variable should be defined with var <VAR>" << endl;
-        throw 10;
+        exit(1);
     } 
     
     it = parsed_options.find("pot");
     if ( it == parsed_options.end() ) {
         cout << "Potential should be defined with pot <POT>" << endl;
-        throw 10;
+        exit(1);
     }
 
     // Set the precision of the output
@@ -153,8 +155,14 @@ void read_input(const string filename, Options &opts, Problem &problem) {
         cout.precision(static_cast<int>(ndigits));
     }
     opts.mpfrs["E0"] = mpfr_float(parsed_options["E0"]);
-    if ( opts.ints["use_complex"] ) 
-        opts.mpfrs["E0I"] = mpfr_float(parsed_options["E0I"]);
+
+    if ( opts.ints["use_complex"] ) {
+        if ( parsed_options.find("E0I") != parsed_options.end() )
+            opts.mpfrs["E0I"] = mpfr_float(parsed_options["E0I"]);
+        else
+            opts.mpfrs["E0I"] = mpfr_float(0);
+    }
+
 
     problem.set_potential(parsed_options["pot"], parsed_options["var"]);
 }
