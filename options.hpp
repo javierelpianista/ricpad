@@ -27,6 +27,7 @@ class Options {
         ints["d"] = 0;
         ints["digits"] = -1;
         ints["infinite_digits"] = 0;
+        ints["log_nr"] = 0;
 
         ints["nr_max_iter"] = 100;
 

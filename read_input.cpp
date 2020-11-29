@@ -26,8 +26,7 @@ void read_input(const string filename, Options &opts, Problem &problem) {
         string what = *p++;
         string value;
 
-        cout << "what: " << what << " val: " << *p << endl;
-
+        // Integer options
         if ( what == "D" ) {
             opts.ints["Dmin"] = stoi(*p++);
             //TODO program the option to not have Dmax
@@ -48,10 +47,16 @@ void read_input(const string filename, Options &opts, Problem &problem) {
             }
         } else if ( what == "nr_max_iter" ) {
             opts.ints["nr_max_iter"] = stoi(*p);
+        } else if ( what == "log_nr" ) {
+            opts.ints["log_nr"] = stoi(*p);
+
+        // mpfr_float options
         } else if ( what == "nr_tolerance" ) {
             opts.mpfrs["nr_tolerance"] = mpfr_float(*p);
         } else if ( what == "nr_diff_epsilon" ) {
             opts.mpfrs["nr_step_size"] = mpfr_float(*p);
+
+        // string options
         } else if ( what == "problem_type" ) {
             opts.strings["problem_type"] = *p;
         } else {
@@ -163,6 +168,30 @@ void read_input(const string filename, Options &opts, Problem &problem) {
             opts.mpfrs["E0I"] = mpfr_float(0);
     }
 
+    // Choose a name for the log file: if the log_file variable was set, then 
+    // use that name. If not, use ricpad.log. If the file chosen exists, append
+    // a number to it, like ricpad.log.0, ricpad.log.1, etc.
+    {
+        string basename, log_file;
+
+        if ( parsed_options.find("log_file") == parsed_options.end() ) {
+            basename = "ricpad.log";
+        } else {
+            basename = parsed_options["log_file"];
+        }
+
+        log_file = basename;
+
+        bool file_exists = ifstream(log_file).good();
+        int i = 0;
+
+        while ( file_exists ) {
+            log_file = basename + "." + to_string(i++);
+            file_exists = ifstream(log_file).good();
+        }
+
+        opts.strings["log_file"] = log_file;
+    }
 
     problem.set_potential(parsed_options["pot"], parsed_options["var"]);
 }

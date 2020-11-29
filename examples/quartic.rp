@@ -7,3 +7,5 @@ s 0
 E0 1.05
 E0I 0.01
 use_complex 1
+log_nr 1
+log_file quartic.log

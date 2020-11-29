@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <ginac/ginac.h>
 #include <boost/multiprecision/mpfr.hpp>
 #include <boost/multiprecision/mpc.hpp>
@@ -178,10 +179,23 @@ T RPM_find_root(
         E = Eold - H/dH;
         desv = mp::abs(Eold - E);
 
+        if ( opts.ints.at("log_nr") ) {
+            ofstream f(opts.strings.at("log_file"), ios_base::app);
+            f.precision(opts.ints.at("digits"));
+            f << setw(8) << niter << " " << setw(opts.ints.at("digits") + 10);
+
+            if ( opts.ints.at("use_complex") ) {
+                f << left << E.real() << " " << E.imag() << endl;
+            } else {
+                f << left << E << endl;
+            }
+            f.close();
+        }
+
         if ( niter++ >= opts.ints.at("nr_max_iter") ) {
             cout << "Maximum number of NR iterations reached. Aborting." 
                 << endl;
-            throw 2;
+            exit(1);
         }
     }
 
@@ -214,13 +228,34 @@ T RPM_solve(const Problem & problem, const Options & opts) {
         Eold = E;
         E = RPM_find_root<T>(D, d, problem, s, E, opts);
         logdif = -log10(abs(E - Eold));
-        cout << D << " " << E << endl;
+
+        cout << setw(6) << D << " " << setw(opts.ints.at("target_digits") + 10); 
+        if ( opts.ints.at("use_complex") ) {
+            cout << left << E.real() << " " << E.imag() << endl;
+        } else {
+            cout << left << E << endl;
+        }
 
         if ( 
                 opts.ints.at("infinite_digits") == 0 &&
                 static_cast<int>(logdif) >= opts.ints.at("target_digits") 
             ) 
             break;
+
+        // Output the same to the log file
+        if ( opts.ints.at("log_nr") ) {
+            ofstream f(opts.strings.at("log_file"), ios_base::app);
+            f.precision(opts.ints.at("digits"));
+            f << endl;
+            f << setw(8) << "D = " + to_string(D) << " " << setw(opts.ints.at("digits") + 10);
+
+            if ( opts.ints.at("use_complex") ) {
+                f << left << E.real() << " " << E.imag() << endl << endl;
+            } else {
+                f << left << E << endl << endl;
+            }
+            f.close();
+        }
     }
 
     return E;

@@ -20,6 +20,8 @@ target_digits <target_digits> # Amount of digits we want the result to be accura
 nr_step_size <nr_step_size>   # Size of the h value in the NR method to compute numerical differentiation. See following section for description.
 nr_tolerance <nr_tolerance>   # Difference between steps of the NR method to consider convergence reached.
 E0I <E0I>                     # Value of the imaginary part of the initial energy. 0 by default.
+log_nr                        # Write the NR steps to the log file
+log_file                      # Name of the logfile. By default it is ricpad.log
 ```
 To call `ricpad`, run:
 ```
