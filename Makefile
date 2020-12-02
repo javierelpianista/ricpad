@@ -2,7 +2,7 @@ AR = ar
 CXX = g++
 LIBS = -lginac -lcln -lgmp -lmpfr -lmpc
 #INCLUDE = -I/home/jgarcia/boost_1_55_0 -I. 
-INCLUDE = -I.
+INCLUDE = -I. -I/usr/include/eigen3
 #FLAGS = -O2 -w
 FLAGS = -O0 -g -w
 OBJS = read_input.o 
@@ -12,6 +12,9 @@ all: ricpad
 
 ricpad: $(HEADERS) ricpad.cpp $(OBJS)
 	$(CXX) $(FLAGS) -o ricpad ricpad.cpp $(INCLUDE) $(OBJS) $(LIBS) 
+
+ricpad2: $(HEADERS) ricpad2.cpp $(OBJS)
+	$(CXX) $(FLAGS) -o ricpad2 ricpad2.cpp $(INCLUDE) $(OBJS) $(LIBS) 
 
 libricpad.a: $(OBJS)
 	$(AR) rvs libricpad.a $(OBJS) 

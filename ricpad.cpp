@@ -16,14 +16,21 @@ int main(int argc, char * argv[]) {
 
     if ( argc == 1 ) {
         cout << "Usage: ricpad [input] [options]" << endl;
-        return 1;
+        return 2;
     }
 
     read_input(argv[1], opts, problem);
 
+    opts.print();
+
+    int result;
     if ( opts.ints.at("use_complex") ) {
-        RPM_solve<mpc_complex>(problem, opts);
+        mpc_complex E;
+        result = RPM_solve<mpc_complex>(problem, opts, E);
     } else {
-        RPM_solve<mpfr_float>(problem, opts);
+        mpfr_float E;
+        result = RPM_solve<mpfr_float>(problem, opts, E);
     }
+
+    return result;
 }

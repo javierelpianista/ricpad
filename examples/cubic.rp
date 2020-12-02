@@ -1,0 +1,11 @@
+pot I*x^3
+var x
+problem_type undefined
+D 2 30
+d 0
+s 0
+E0 1.05
+f0 
+use_complex 1
+log_nr 1
+log_file quartic.log

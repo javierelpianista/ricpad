@@ -1,9 +1,11 @@
-pot -exp(-2/100*r)/r
+pot -exp(-1/10*r)/r
 var r
 problem_type radial
-D 2 30
+D 3 120
 d 0
 s 0
-E0 -0.4
+E0 -0.04
 E0I 0.00
-use_complex 1
+use_complex 0
+log_nr 1
+target_digits 240

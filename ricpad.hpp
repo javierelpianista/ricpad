@@ -149,21 +149,27 @@ T hankdet(
 }
 
 
+// Find the root of the Hankel determinant for D, d, s, and problem. Store it 
+// in E. Return 0 if succeeded and 1 if the number of iterations was greater
+// than opts.ints.at("nr_max_iter").
 template <class T>
-T RPM_find_root(
+int RPM_find_root(
         const int D, 
         const int d, 
         const Problem &problem,
         const int s,
         const T E0,
-        const Options & opts
+        const Options & opts, 
+        T & E
         )
 {
-    T E = E0, Eold;
+    T Eold;
     mpfr_float tol(opts.mpfrs.at("nr_tolerance"));
     mpfr_float desv = tol + 1;
     T h;
     T dH, H;
+
+    E = E0;
 
     int niter = 0;
 
@@ -193,27 +199,18 @@ T RPM_find_root(
         }
 
         if ( niter++ >= opts.ints.at("nr_max_iter") ) {
-            cout << "Maximum number of NR iterations reached. Aborting." 
+            cout << "Maximum number of NR iterations reached." 
                 << endl;
-            exit(1);
+            return 1;
         }
     }
 
-    return E;
+    return 0;
 }
 
 template <class T>
-T RPM_solve(const Problem & problem, const Options & opts) {
-    T E;
-
+int RPM_solve(const Problem & problem, const Options & opts, T & E) {
     assign_E0(E, opts);
-//
-//    if ( opts.ints.at("use_complex") ) 
-//        E = T(opts.mpfrs.at("E0"), opts.mpfrs.at("E0I"));
-//    else 
-//        E = T(opts.mpfrs.at("E0"));
-//
-    cout << "E0: " << E << endl;
 
     T Eold = 0;
     T logdif = 0; 
@@ -222,11 +219,23 @@ T RPM_solve(const Problem & problem, const Options & opts) {
 
     int accurate_digits = 0;
 
-    cout << "d = " << d << endl;
-
     for ( int D = opts.ints.at("Dmin"); D <= opts.ints.at("Dmax"); D++ ) {
         Eold = E;
-        E = RPM_find_root<T>(D, d, problem, s, E, opts);
+        int result, newd = d, ntries = 0;
+
+        result = RPM_find_root<T>(D, d, problem, s, Eold, opts, E);
+
+        // If the iterations failed, try again with d+=1
+        while ( result == 1 ) {
+            cout << "Trying d = " << ++newd << endl;
+            result = RPM_find_root<T>(D, newd, problem, s, Eold, opts, E);
+            if ( ++ntries == 3 ) {
+                cout << "Convergence failed with four different values of d."
+                    << " Aborting." << endl;
+                return 1;
+            }
+        }
+
         logdif = -log10(abs(E - Eold));
 
         cout << setw(6) << D << " " << setw(opts.ints.at("target_digits") + 10); 
@@ -258,7 +267,7 @@ T RPM_solve(const Problem & problem, const Options & opts) {
         }
     }
 
-    return E;
+    return 0;
 }
 
 #endif

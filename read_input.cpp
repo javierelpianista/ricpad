@@ -4,12 +4,15 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/multiprecision/mpfr.hpp>
+#include <boost/multiprecision/mpc.hpp>
 
 #include <options.hpp>
 #include <problem.hpp>
 
 using namespace std;
 namespace mp = boost::multiprecision;
+using mp::mpfr_float;
+using mp::mpc_complex;
 
 void read_input(const string filename, Options &opts, Problem &problem) {
     map<string, string> parsed_options;
@@ -79,7 +82,6 @@ void read_input(const string filename, Options &opts, Problem &problem) {
         if ( opts.ints["digits"] == -1 ) 
             opts.ints["digits"] = opts.ints["target_digits"] + 200;
 
-        mpfr_float::default_precision(opts.ints["digits"]);
         if ( opts.mpfrs["nr_tolerance"] == -1 ) {
             ostringstream oss;
             oss << "1E-" << opts.ints["target_digits"] + 20;
@@ -100,8 +102,6 @@ void read_input(const string filename, Options &opts, Problem &problem) {
             throw 1;
         }
 
-        mpfr_float::default_precision(opts.ints["digits"]);
-
         opts.mpfrs["nr_tolerance"] = mpfr_float(
                 "1E-" + to_string(opts.ints["digits"] - 180)
                 );
@@ -113,11 +113,9 @@ void read_input(const string filename, Options &opts, Problem &problem) {
     // Else, set target_digits to 40 and everything else accordingly
     else {
         opts.ints["digits"] = 240;
-        mpfr_float::default_precision(opts.ints["digits"]);
 
         if ( opts.ints["infinite_digits"] == 0 ) 
             opts.ints["target_digits"] = 40;
-
 
         if ( opts.mpfrs["nr_tolerance"] == -1 ) 
             opts.mpfrs["nr_tolerance"] = mpfr_float("1E-60");
@@ -126,6 +124,9 @@ void read_input(const string filename, Options &opts, Problem &problem) {
             opts.mpfrs["nr_step_size"] = mpfr_float("1E-140");
     }
 
+    gi::Digits = opts.ints["digits"];
+    mpfr_float::default_precision(opts.ints["digits"]);
+    mpc_complex::default_precision(opts.ints["digits"]);
 
     // **********************************************************************
     // Now take care of options that define the problem or require 
