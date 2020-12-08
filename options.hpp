@@ -1,5 +1,6 @@
 #ifndef OPTIONS
 #define OPTIONS
+
 #include <map>
 #include <string>
 #include <iostream>

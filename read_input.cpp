@@ -161,6 +161,7 @@ void read_input(const string filename, Options &opts, Problem &problem) {
         cout.precision(static_cast<int>(ndigits));
     }
     opts.mpfrs["E0"] = mpfr_float(parsed_options["E0"]);
+    opts.mpfrs["f0"] = mpfr_float(parsed_options["f0"]);
 
     if ( opts.ints["use_complex"] ) {
         if ( parsed_options.find("E0I") != parsed_options.end() )

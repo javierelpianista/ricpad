@@ -6,10 +6,12 @@
 
 #include <ginac/ginac.h>
 #include <boost/multiprecision/mpfr.hpp>
+#include <boost/multiprecision/mpc.hpp>
 
 #include <options.hpp>
 
 using namespace std;
+using boost::multiprecision::mpc_complex;
 namespace gi = GiNaC;
 
 template <class T>
@@ -20,9 +22,10 @@ T gi_to_mp(
     ostringstream oss;
     oss << num;
 
+    T ans(oss.str());
+
     return T(oss.str());
 }
-
 
 class Problem {
     gi::symbol x;
@@ -72,7 +75,8 @@ class Problem {
             int mult;
 
             if ( problem_type == "even" ) mult = 2;
-            else if ( problem_type == "radial" ) mult = 1;
+            else if ( problem_type == "radial" || problem_type == "asymmetric" )
+                mult = 1;
 
             for ( int i = 0; i <= N; i++ ) {
                 if ( use_rationals == 1 ) {

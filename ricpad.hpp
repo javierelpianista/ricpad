@@ -55,12 +55,78 @@ mpc_complex NR_step_size<mpc_complex>(const Options & opts) {
         (mpc_complex(1,1))/mp::sqrt(mpfr_float(2));
 }
 
+namespace HankelCoefficients {
+// Riccati coefficients for even problems defined by:
+// [ -d^2/dx^2 + V(x) ] \psi(x) = E \psi(x).
+// Where V(x) = V(-x), and therefore \psi(x) is either even or odd.
+// s = 0 for even eigenfunctions, and s = 1 for odd eigenfunctions
+// V(x) must not be singular at origin, meaning it can be expanded in 
+// a Taylor series: V(x) = sum_{j=0}^{\infty} v_j x^{2j}
+template <class T>
+vector<T> symmetric(
+        const int N,
+        const int s,
+        const T E,
+        const vector<T>& v_coefs
+        )
+{ 
+    vector<T> coefs;
+    coefs.reserve(N+1);
+    coefs.push_back(E - v_coefs[0]);
+
+    T sum;
+
+    for ( int j = 1; j <= N; j++ ) {
+        sum = 0;
+        for ( int k = 0; k <= j-1; k++ ) {
+            sum += coefs[k]*coefs[j-k-1];
+        }
+        coefs.push_back((sum - v_coefs[j])/(2*j+2*s+1));
+    }
+
+    return coefs;
+}
+
+// Riccati coefficients for even problems defined by:
+// [ -d^2/dx^2 + V(x) ] \psi(x) = E \psi(x).
+// No symmetry is assumed for V(x) or \psi(x), and therefore both the initial
+// coefficient f[0] = f0 and the energy E are required.
+//
+template <class T>
+vector<T> asymmetric(
+        const int N,
+        const T E,
+        const T f0, 
+        const vector<T>& v_coefs
+        )
+{
+    vector<T> coefs;
+    coefs.reserve(N+1);
+    coefs.push_back(f0);
+
+    T sum;
+
+    for ( int j = 1; j <= N; j++ ) {
+        sum = 0;
+        for ( int k = 0; k <= j-1; k++ ) {
+            sum += coefs[k]*coefs[j-k-1];
+        }
+        if ( j == 1 ) sum += E;
+        coefs.push_back((sum - v_coefs[j-1])/j);
+
+    }
+    
+    return coefs;
+}
+
+} //namespace hankcoefs
+
 // Return a vector with the Hankel coefficients up to N
 template <class T>
 vector<T> hankcoefs(
-        int N, 
+        const int N, 
         const Problem &problem, 
-        int s,
+        const int s,
         const T E0, 
         const Options & opts
         ) 
@@ -114,20 +180,15 @@ template <class T>
 T hankdet(
         const int D, 
         const int d, 
-        const Problem &problem, 
-        const int s,
-        const T E0, 
-        const Options & opts 
+        // Coefficients f[d+2]...f[2*D+d-2]. This vector is destroyed.
+        std::vector<T>& coefs
         ) {
-    vector<T> coefs, coefsm1, coefsm2;
+    vector<T> coefsm1, coefsm2;
 
     if ( D == 0 ) {
         return 1;
     } else {
         coefsm1 = std::vector<T>(2*D, T(1));
-
-        coefs = hankcoefs<T>(2*D + d - 1, problem, s, E0, opts);
-        coefs.erase(coefs.begin(), coefs.begin()+d+1);
 
         if ( D == 1 ) return coefs[0];
 
